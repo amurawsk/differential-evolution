@@ -1,72 +1,103 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def initialize_population(pop_size: int, dim: int, bounds: tuple[float, float]) -> np.ndarray:
-    return np.random.uniform(bounds[0], bounds[1], size=(pop_size, dim))
 
-def differential_evolution(
-        func: callable,
-        dim: int,
-        bounds: tuple[float, float],
-        pop_size: int = 20,
-        F: float = 0.5,
-        CR: float = 0.9,
-        max_iter: int = 100
-) -> tuple[np.ndarray, float]:
-    population = initialize_population(pop_size, dim, bounds)
-    fitness = np.array([func(*ind) for ind in population])
-    trace = []
+class DifferentialEvolution:
+    def __init__(self, func, dim, bounds, pop_size=20, F=0.5, CR=0.9, max_iter=100):
+        self.func = func
+        self.dim = dim
+        self.bounds = bounds
+        self.pop_size = pop_size
+        self.F = F
+        self.CR = CR
+        self.max_iter = max_iter
+        self.population = self.initialize_population()
+        self.fitness = np.array([self.func(*ind) for ind in self.population])
+        self.trace = []
 
-    for iteration in range(max_iter):
-        new_population = np.copy(population)
-        for i in range(pop_size):
+    def initialize_population(self) -> np.ndarray:
+        return np.random.uniform(self.bounds[0], self.bounds[1], size=(self.pop_size, self.dim))
 
-            idxs = np.random.choice(pop_size, 3, replace=False)
-            while i in idxs:
-                idxs = np.random.choice(pop_size, 3, replace=False)
+    def run(self, mode="normal"):
+        for iteration in range(self.max_iter):
+            new_population = np.copy(self.population)
+            success_count = 0
 
-            a, b, c = population[idxs]
+            for i in range(self.pop_size):
+                idxs = np.random.choice(self.pop_size, 3, replace=False)
+                while i in idxs:
+                    idxs = np.random.choice(self.pop_size, 3, replace=False)
 
-            mutant = a + F * (b - c)
-            mutant = np.clip(mutant, bounds[0], bounds[1])
+                a, b, c = self.population[idxs]
+                mutant = a + self.F * (b - c)
+                mutant = np.clip(mutant, self.bounds[0], self.bounds[1])
 
-            crossover = np.copy(population[i])
-            for d in range(dim):
-                if np.random.rand() < CR:
-                    crossover[d] = mutant[d]
+                trial = np.copy(self.population[i])
+                for d in range(self.dim):
+                    if np.random.rand() < self.CR:
+                        trial[d] = mutant[d]
 
-            if func(*crossover) < fitness[i]:
-                new_population[i] = crossover
-                fitness[i] = func(*crossover)
+                trial_fitness = self.func(*trial)
+                if trial_fitness < self.fitness[i]:
+                    new_population[i] = trial
+                    self.fitness[i] = trial_fitness
+                    success_count += 1
 
-        population = new_population
-        best_idx = np.argmin(fitness)
-        trace.append(population[best_idx])
+            self.population = new_population
 
-    plot_de(trace, func)
-    return population[best_idx], fitness[best_idx]
+            if mode == "PSR":
+                self.F = self.update_F_psr(success_count)
+            elif mode == "MSR":
+                self.F = self.update_F_msr()
+
+            best_idx = np.argmin(self.fitness)
+            self.trace.append(self.population[best_idx])
+
+        return self.population[best_idx], self.fitness[best_idx]
+
+    def update_F_msr(self, amplifier=1.1, reductor=0.9) -> float:
+        diffs = self.fitness - np.array([self.func(*ind) for ind in self.population])
+        median = np.median(diffs)
+        if median < 0:
+            self.F *= amplifier
+        else:
+            self.F *= reductor
+        return np.clip(self.F, 0.1, 1.0)
+
+    def update_F_psr(self, success_count, target_ratio=0.5, amplifier=1.1, reductor=0.9) -> float:
+        success_ratio = success_count / self.pop_size
+        if success_ratio < target_ratio:
+            self.F *= reductor
+        else:
+            self.F *= amplifier
+        return np.clip(self.F, 0.1, 1.0)
+
+    def plot_trace(self, title="Optimization Trace"):
+        x = np.arange(self.bounds[0], self.bounds[1], 0.05)
+        y = np.arange(self.bounds[0], self.bounds[1], 0.05)
+        x, y = np.meshgrid(x, y)
+        z = self.func(x, y)
+
+        plt.figure()
+        plt.contour(x, y, z, 50)
+        trace_x = [ind[0] for ind in self.trace]
+        trace_y = [ind[1] for ind in self.trace]
+        plt.scatter(trace_x, trace_y, s=10)
+        plt.scatter(trace_x[-10:], trace_y[-10:], s=10, color='red')
+        plt.title(title)
+        plt.show()
 
 
-def plot_de(trace, f2):
 
-    x = np.arange(-2, 2, 0.05)
-    y = np.arange(-3, 2, 0.05)
-    x, y = np.meshgrid(x, y)
-    z = f2(x, y)
-    plt.figure()
-    plt.contour(x, y, z, 50)
-    trace_x = [ind[0] for ind in trace]
-    trace_y = [ind[1] for ind in trace]
-    plt.scatter(trace_x, trace_y, s=10)
-    plt.scatter(trace_x[-10:], trace_y[-10:], s=10, color='red')
-    plt.title(f'siema')
-    plt.show()
+
 
 if __name__ == "__main__":
     f2 = lambda x, y: 1.5 - np.exp(-x ** 2 - y ** 2) - 0.5 * np.exp(-(x - 1) ** 2 - (y + 2) ** 2)
     dim = 2
-    bounds = (-30, 30)
-    best_solution, best_fitness = differential_evolution(
-        f2, dim, bounds, pop_size=30, max_iter=100
+    bounds = (-3, 3)
+    DE = DifferentialEvolution(f2, dim, bounds, pop_size=30, max_iter=30)
+    best_solution, best_fitness = DE.run(
+        mode="MSR"
     )
+    DE.plot_trace(title="DE")
 
