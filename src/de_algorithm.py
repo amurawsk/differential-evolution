@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import cec2017
+from cec2017.functions import all_functions
 
 
 class DifferentialEvolution:
