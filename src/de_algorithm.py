@@ -1,3 +1,5 @@
+import functools
+
 import numpy as np
 import matplotlib.pyplot as plt
 from cec2017.functions import all_functions
@@ -13,7 +15,7 @@ class DifferentialEvolution:
         self.CR = CR
         self.max_iter = max_iter
         self.population = self.initialize_population()
-        self.fitness = np.array([self.func(*ind) for ind in self.population])
+        self.fitness = self.func(self.population)
         self.trace = []
         self.mode = mode
 
@@ -39,10 +41,10 @@ class DifferentialEvolution:
                     if np.random.rand() < self.CR:
                         trial[d] = mutant[d]
 
-                trial_fitness = self.func(*trial)
+                trial_fitness = self.func([trial])
                 if trial_fitness < self.fitness[i]:
                     new_population[i] = trial
-                    self.fitness[i] = trial_fitness
+                    self.fitness[i] = trial_fitness[0]
                     success_count += 1
 
             self.population = new_population
@@ -58,7 +60,7 @@ class DifferentialEvolution:
         return self.population[best_idx], self.fitness[best_idx]
 
     def update_F_msr(self, amplifier=1.1, reductor=0.9) -> float:
-        diffs = self.fitness - np.array([self.func(*ind) for ind in self.population])
+        diffs = self.fitness - self.func(self.population)
         median = np.median(diffs)
         if median < 0:
             self.F *= amplifier
@@ -74,35 +76,21 @@ class DifferentialEvolution:
             self.F *= amplifier
         return np.clip(self.F, 0.1, 1.0)
 
-    def plot_trace(self, title="Optimization Trace"):
-        x = np.arange(self.bounds[0], self.bounds[1], 0.05)
-        y = np.arange(self.bounds[0], self.bounds[1], 0.05)
-        x, y = np.meshgrid(x, y)
-        z = self.func(x, y)
-
-        plt.figure()
-        plt.contour(x, y, z, 50)
-        trace_x = [ind[0] for ind in self.trace]
-        trace_y = [ind[1] for ind in self.trace]
-        plt.scatter(trace_x, trace_y, s=10)
-        plt.scatter(trace_x[-10:], trace_y[-10:], s=10, color='red')
-        plt.title(title)
-        plt.show()
-
-
-
-
 
 if __name__ == "__main__":
-    f2 = lambda x, y: 1.5 - np.exp(-x ** 2 - y ** 2) - 0.5 * np.exp(-(x - 1) ** 2 - (y + 2) ** 2)
-    dim = 2
-    bounds = (-3, 3)
-    DE = DifferentialEvolution(f2, dim, bounds, pop_size=30, max_iter=30)
+    # f2 = lambda x, y: 1.5 - np.exp(-x ** 2 - y ** 2) - 0.5 * np.exp(-(x - 1) ** 2 - (y + 2) ** 2)
+    f2 = all_functions[22]
+    dim = 30
+    bounds = (-300, 300)
     DE_normal = DifferentialEvolution(f2, dim, bounds, pop_size=30, max_iter=30)
     DE_psr = DifferentialEvolution(f2, dim, bounds, pop_size=30, max_iter=30, mode="PSR")
     DE_msr = DifferentialEvolution(f2, dim, bounds, pop_size=30, max_iter=30, mode="MSR")
 
-    best_solution, best_fitness = DE.run(
-    )
-    DE.plot_trace(title="DE")
+    best_solution_normal, best_fitness_normal = DE_normal.run()
+    print(f"best normal fitness: {best_fitness_normal}")
+    best_solution_psr, best_fitness_psr = DE_psr.run()
+    print(f"best PSR fitness:    {best_fitness_psr}")
+    best_solution_msr, best_fitness_msr = DE_msr.run()
+    print(f"best MSR fitness:    {best_fitness_msr}")
+
 
