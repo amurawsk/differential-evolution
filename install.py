@@ -3,7 +3,6 @@ import subprocess
 
 def install_dependencies():
     subprocess.run(['pip', 'install', '-r', 'requirements.txt'], check=True)
-    subprocess.run(['pip', 'install', 'setuptools'], check=True)
 
 def install_cec2017():
     repo_url = "https://github.com/tilleyd/cec2017-py"

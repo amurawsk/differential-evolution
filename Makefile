@@ -7,4 +7,4 @@ install-dependencies:
 
 install-cec2017:
 	git clone https://github.com/tilleyd/cec2017-py.git
-	cd cec2017-py && python3 setup.py install
+	cd cec2017-py && pip install .
