@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools", "wheel"]  # Needed to build the project
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "my_project"
+version = "1.0.0"
+description = "My project using cec2017-py"
+dependencies = [
+    "numpy~=2.2.1",
+    "matplotlib~=3.10.0",
+    "setuptools",
+]

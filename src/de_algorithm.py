@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import cec2017
 
 
 class DifferentialEvolution:
-    def __init__(self, func, dim, bounds, pop_size=20, F=0.5, CR=0.9, max_iter=100):
+    def __init__(self, func, dim, bounds, pop_size=20, F=0.5, CR=0.9, max_iter=100, mode="normal"):
         self.func = func
         self.dim = dim
         self.bounds = bounds
@@ -14,11 +15,12 @@ class DifferentialEvolution:
         self.population = self.initialize_population()
         self.fitness = np.array([self.func(*ind) for ind in self.population])
         self.trace = []
+        self.mode = mode
 
     def initialize_population(self) -> np.ndarray:
         return np.random.uniform(self.bounds[0], self.bounds[1], size=(self.pop_size, self.dim))
 
-    def run(self, mode="normal"):
+    def run(self, amplifier=1.1, reductor=0.9):
         for iteration in range(self.max_iter):
             new_population = np.copy(self.population)
             success_count = 0
@@ -45,10 +47,10 @@ class DifferentialEvolution:
 
             self.population = new_population
 
-            if mode == "PSR":
-                self.F = self.update_F_psr(success_count)
-            elif mode == "MSR":
-                self.F = self.update_F_msr()
+            if self.mode == "PSR":
+                self.F = self.update_F_psr(success_count, amplifier, reductor)
+            elif self.mode == "MSR":
+                self.F = self.update_F_msr(amplifier, reductor)
 
             best_idx = np.argmin(self.fitness)
             self.trace.append(self.population[best_idx])
@@ -96,8 +98,11 @@ if __name__ == "__main__":
     dim = 2
     bounds = (-3, 3)
     DE = DifferentialEvolution(f2, dim, bounds, pop_size=30, max_iter=30)
+    DE_normal = DifferentialEvolution(f2, dim, bounds, pop_size=30, max_iter=30)
+    DE_psr = DifferentialEvolution(f2, dim, bounds, pop_size=30, max_iter=30, mode="PSR")
+    DE_msr = DifferentialEvolution(f2, dim, bounds, pop_size=30, max_iter=30, mode="MSR")
+
     best_solution, best_fitness = DE.run(
-        mode="MSR"
     )
     DE.plot_trace(title="DE")
 
