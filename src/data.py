@@ -4,7 +4,7 @@ import numpy as np
 import json
 
 
-def get_data(results_df, function, dim, bounds, F, CR, index, i, pop_size, max_iter):
+def get_data(results_df, function, dim, bounds, F, CR, index, pop_size, max_iter):
     modes = ["normal", "PSR", "MSR"]
     for mode in modes:
         avg_fitnesses = []

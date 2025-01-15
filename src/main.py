@@ -15,12 +15,11 @@ def main():
     results_df = pd.DataFrame(columns=columns)
 
     for index, function in tqdm(enumerate(all_functions[:1])):
-        for i in range(1):
-            for dim in dimensions:
-                for F in tqdm(range(1, 10)):
-                    for CR in range(1, 10):
-                        get_data(results_df=results_df, function=function, dim=dim, bounds=bounds, F=F/10, CR=CR/10, index=index, i=i, pop_size=100, max_iter=500)
-            # print(f"Function {index + 1}, dim:{dim} done")
+        for dim in dimensions:
+            for F in tqdm(range(1, 10)):
+                for CR in range(1, 10):
+                    get_data(results_df=results_df, function=function, dim=dim, bounds=bounds, F=F/10, CR=CR/10, index=index, pop_size=100, max_iter=500)
+        # print(f"Function {index + 1}, dim:{dim} done")
 
     # agg_results = results_df.groupby(['function', 'dim', 'mode', 'F', 'CR']).agg(['mean', 'median']).reset_index()
     results_df.to_csv(f'output-{datetime.now()}.csv', index=False)
