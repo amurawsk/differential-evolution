@@ -3,7 +3,7 @@ import json
 import os
 
 
-def plot_avg_fitness_per_iteration_logscale(results_df, output_dir="plots"):
+def plot_avg_fitness_per_iteration_logscale(results_df, output_dir="plots/fit"):
     os.makedirs(output_dir, exist_ok=True)
     for (F, CR, dim) in results_df.groupby(['F', 'CR', 'dim']).groups:
         plt.figure(figsize=(12, 8))
@@ -38,7 +38,7 @@ def plot_avg_fitness_per_iteration_logscale(results_df, output_dir="plots"):
         plt.close()
 
 
-def plot_result_vars_per_iteration_logscale(results_df, output_dir="plots"):
+def plot_result_vars_per_iteration_logscale(results_df, output_dir="plots/var"):
     os.makedirs(output_dir, exist_ok=True)
     for (F, CR, dim) in results_df.groupby(['F', 'CR', 'dim']).groups:
         plt.figure(figsize=(12, 8))
