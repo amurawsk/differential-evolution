@@ -4,7 +4,7 @@ import numpy as np
 
 
 class DifferentialEvolution:
-    def __init__(self, func, dim, bounds, population = None, pop_size=20, F=0.5, CR=0.9, max_iter=100, mode="normal", amplifier=1.05, reductor=0.95, target_ratio=0.2, threshold_percentage = 0.08):
+    def __init__(self, func, dim, bounds, population = None, pop_size=20, F=0.5, CR=0.9, max_iter=100, mode="normal", amplifier=1.05, reductor=0.95, target_ratio=0.2, threshold_percentage = None):
         self.func = func
         self.dim = dim
         self.bounds = bounds
@@ -23,7 +23,10 @@ class DifferentialEvolution:
         self.amplifier = amplifier
         self.reductor = reductor
         self.target_ratio = target_ratio
-        self.threshold_percentage = threshold_percentage
+        if threshold_percentage is None:
+            self.threshold_percentage = 0.08 if self.dim == 10 else 0.02
+        else:
+            self.threshold_percentage = threshold_percentage
 
     def initialize_population(self) -> np.ndarray:
         return np.random.uniform(self.bounds[0], self.bounds[1], size=(self.pop_size, self.dim))
