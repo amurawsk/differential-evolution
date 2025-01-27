@@ -13,7 +13,7 @@ def demonstration():
     columns = ['function', 'dim', 'F', 'CR', 'mode', 'avg_fitnesses', 'result_vars', 'f_trace']
     results_df = pd.DataFrame(columns=columns)
 
-    for index, function in tqdm(enumerate(all_functions[:1])):
+    for index, function in tqdm(enumerate(all_functions)):
         for dim in dimensions:
             pop_size = 10*dim
             max_iter = 40*dim
@@ -30,7 +30,7 @@ def different_amplifier_reductor_msr():
     columns = ['function', 'dim', 'F', 'CR', 'mode', 'step', 'avg_fitnesses', 'result_vars', 'f_trace']
     results_df = pd.DataFrame(columns=columns)
     
-    for index, function in tqdm(enumerate(all_functions[:1])): # todo
+    for index, function in tqdm(enumerate(all_functions)):
         for dim in dimensions:
             pop_size = 10*dim
             max_iter = 40*dim
@@ -47,7 +47,7 @@ def different_target_ratio():
     columns = ['function', 'dim', 'F', 'CR', 'mode', 'target_ratio', 'avg_fitnesses', 'result_vars', 'f_trace']
     results_df = pd.DataFrame(columns=columns)
 
-    for index, function in tqdm(enumerate(all_functions[:1])):
+    for index, function in tqdm(enumerate(all_functions)):
         for dim in dimensions:
             pop_size = 10*dim
             max_iter = 40*dim
@@ -64,7 +64,7 @@ def different_threshold_percentage():
     columns = ['function', 'dim', 'F', 'CR', 'mode', 'threshold', 'avg_fitnesses', 'result_vars', 'f_trace']
     results_df = pd.DataFrame(columns=columns)
 
-    for index, function in tqdm(enumerate(all_functions[:1])):
+    for index, function in tqdm(enumerate(all_functions)):
         for dim in dimensions:
             pop_size = 10*dim
             max_iter = 40*dim
@@ -93,7 +93,7 @@ def comparison():
     columns = ['function', 'dim', 'F', 'CR', 'mode', 'min_fitness']
     results_df = pd.DataFrame(columns=columns)
 
-    for index, function in tqdm(enumerate(all_functions[:1])):
+    for index, function in tqdm(enumerate(all_functions)):
         for dim in dimensions:
             pop_size = 10*dim
             max_iter = 40*dim
