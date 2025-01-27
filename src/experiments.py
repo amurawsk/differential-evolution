@@ -73,3 +73,35 @@ def different_threshold_percentage():
                 get_different_threshold_data(results_df=results_df, population=population, function=function, dim=dim, bounds=bounds, F=0.5, CR=0.9, index=index, pop_size=pop_size, max_iter=max_iter, threshold=threshold)
     plot_threshold(results_df)
     results_df.to_json('../records/different_threshold.json', orient='records', lines=True)
+
+
+def print_difference(results_df):
+    all_diffs = {}
+    for mode in results_df['mode'].unique():
+        for dim in results_df['dim'].unique():
+            subset_dim = results_df[(results_df['mode'] == mode) & (results_df['dim'] == dim)]
+            min_fitnesses_dim10 = subset_dim['min_fitness']
+            best_values = [int(x.split()[-1]) * 100 for x in subset_dim['function']]
+            diffs = min_fitnesses_dim10 - best_values
+            all_diffs[f'{mode}, dim {dim}'] = np.sum(diffs)
+    return all_diffs
+
+
+def comparison():
+    dimensions = [10, 30]
+    bounds = (-100, 100)
+    columns = ['function', 'dim', 'F', 'CR', 'mode', 'min_fitness']
+    results_df = pd.DataFrame(columns=columns)
+
+    for index, function in tqdm(enumerate(all_functions[:1])):
+        for dim in dimensions:
+            pop_size = 10*dim
+            max_iter = 40*dim
+            populations = [np.random.uniform(bounds[0], bounds[1], size=(pop_size, dim)) for _ in range(2)]
+            get_de_data(results_df=results_df, populations=populations, function=function, dim=dim, bounds=bounds, F=0.5, CR=0.9, index=index, pop_size=pop_size, max_iter=max_iter)
+    plot_comparison(results_df)
+    diffs = print_difference(results_df)    
+    with open("../records/diffs.json", "w") as f:
+        json.dump(diffs, f, indent=4)
+
+    results_df.to_json('../records/comparison.json', orient='records', lines=True)

@@ -1,5 +1,6 @@
 from differential_evolution import DifferentialEvolution
 import json
+import numpy as np
 
 
 def get_single_run_for_all_modes(results_df, population, function, dim, bounds, F, CR, index, pop_size, max_iter):
@@ -71,3 +72,22 @@ def get_different_threshold_data(results_df, population, function, dim, bounds, 
         'result_vars': json.dumps(list(de_instance.result_vars)),
         'f_trace': json.dumps(list(de_instance.trace_f))
     }
+
+
+def get_de_data(results_df, populations, function, dim, bounds, F, CR, index, pop_size, max_iter):
+    modes = ["normal", "PSR", "MSR"]
+    for mode in modes:
+        min_fitnesses = []
+        for i in range(len(populations)):
+            de_instance = DifferentialEvolution(function, dim, bounds, population=populations[i].copy(), pop_size=pop_size, max_iter=max_iter, F=F, CR=CR, mode=mode)
+            de_instance.run()
+            min_fitnesses.append(min(de_instance.avg_fitnesses))
+
+        results_df.loc[len(results_df)] = {
+            'function': f"function {index + 1}",
+            'dim': dim,
+            'F': F,
+            'CR': CR,
+            'mode': mode,
+            'min_fitness': np.average(min_fitnesses),
+        }

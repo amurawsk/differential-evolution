@@ -258,3 +258,43 @@ def plot_threshold(results_df):
 
                 plt.tight_layout()
                 plt.savefig(filename)
+
+
+def plot_comparison(results_df):
+    sns.set_style("whitegrid")
+    modes = results_df['mode'].unique()
+    colors = ['blue', 'green', 'red']
+    filename = f"../plots/comparison/comparison.png"
+
+    fig, axes = plt.subplots(len(modes), 2, figsize=(18, 4 * len(modes)))
+    for i, mode in enumerate(modes):
+        subset_dim10 = results_df[(results_df['mode'] == mode) & (results_df['dim'] == 10)]
+
+        if subset_dim10.empty:
+            continue
+
+        min_fitnesses_dim10 = subset_dim10['min_fitness']
+
+        ax1 = axes[i, 0]
+        ax1.scatter(range(1, len(min_fitnesses_dim10)+1), min_fitnesses_dim10, label=f"{mode}, dim: 10 - min fitness", s=50, c=colors[i])
+        ax1.set_title(f"{mode} (min fitness for function)")
+        ax1.set_xlabel("Function")
+        ax1.set_ylabel("Min Fitness - Optimal")
+        ax1.legend()
+
+        subset_dim30 = results_df[(results_df['mode'] == mode) & (results_df['dim'] == 30)]
+    
+        if subset_dim30.empty:
+            continue
+
+        min_fitnesses_dim30 = subset_dim30['min_fitness']
+
+        ax2 = axes[i, 1]
+        ax2.scatter(range(1, len(min_fitnesses_dim30)+1), min_fitnesses_dim30, label=f"{mode}, dim: 30 - min fitness", s=50, c=colors[i])
+        ax2.set_title(f"{mode} (min fitness for function)")
+        ax2.set_xlabel("Function")
+        ax2.set_ylabel("Min Fitness")
+        ax2.legend()
+
+    plt.tight_layout()
+    plt.savefig(filename)
