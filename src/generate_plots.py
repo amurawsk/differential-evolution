@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import json
 import seaborn as sns
+import numpy as np
 
 
 def plot_demonstration(results_df):
@@ -66,6 +67,7 @@ def plot_demonstration(results_df):
 
                 plt.tight_layout()
                 plt.savefig(filename)
+                plt.close(fig)
 
 
 def plot_amplifier_reductor(results_df):
@@ -130,6 +132,7 @@ def plot_amplifier_reductor(results_df):
 
                 plt.tight_layout()
                 plt.savefig(filename)
+                plt.close(fig)
 
 
 def plot_target_ratio(results_df):
@@ -194,6 +197,7 @@ def plot_target_ratio(results_df):
 
                 plt.tight_layout()
                 plt.savefig(filename)
+                plt.close(fig)
 
 
 def plot_threshold(results_df):
@@ -258,6 +262,7 @@ def plot_threshold(results_df):
 
                 plt.tight_layout()
                 plt.savefig(filename)
+                plt.close(fig)
 
 
 def plot_comparison(results_df):
@@ -298,3 +303,32 @@ def plot_comparison(results_df):
 
     plt.tight_layout()
     plt.savefig(filename)
+    plt.close(fig)
+
+
+def plot_accuracy(data, filename):
+    modes = ["normal", "PSR", "MSR"]
+    dim_10_values = [data[f"{mode}, dim 10"] for mode in modes]
+    dim_30_values = [data[f"{mode}, dim 30"] for mode in modes]
+
+    x = np.arange(len(modes))
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+    axes[0].bar(x, dim_10_values, color=['blue', 'green', 'red'])
+    axes[0].set_xticks(x)
+    axes[0].set_xticklabels(modes)
+    axes[0].set_yscale("log")
+    axes[0].set_title("Dim 10")
+    axes[0].set_ylabel("Value")
+
+    axes[1].bar(x, dim_30_values, color=['blue', 'green', 'red'])
+    axes[1].set_xticks(x)
+    axes[1].set_xticklabels(modes)
+    axes[1].set_yscale("log")
+    axes[1].set_title("Dim 30")
+    axes[1].set_ylabel("Value")
+
+    plt.tight_layout()
+    plt.savefig(filename)
+    plt.close(fig)

@@ -8,6 +8,7 @@ def main():
     different_target_ratio()
     different_threshold_percentage()
     comparison()
+    comparison_without2()
 
 
 if __name__ == "__main__":

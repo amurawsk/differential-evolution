@@ -1,6 +1,5 @@
 from differential_evolution import DifferentialEvolution
 import json
-import numpy as np
 
 
 def get_single_run_for_all_modes(results_df, population, function, dim, bounds, F, CR, index, pop_size, max_iter):
@@ -89,5 +88,5 @@ def get_de_data(results_df, populations, function, dim, bounds, F, CR, index, po
             'F': F,
             'CR': CR,
             'mode': mode,
-            'min_fitness': np.average(min_fitnesses),
+            'min_fitness': min(min_fitnesses),
         }
